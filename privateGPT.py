@@ -9,6 +9,9 @@ import os
 import argparse
 import time
 import streamlit as st
+from langchain.docstore.document import Document
+from ingest import main as ingest_main
+
 load_dotenv()
 
 embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
@@ -41,30 +44,44 @@ def main():
             raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
         
     qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
-    # Interactive questions and answers
-    while True:
-        query = input("\nEnter a query: ")
-        if query == "exit":
-            break
-        if query.strip() == "":
-            continue
+    
 
+    # configure the streamlit app
+    st.set_page_config(page_title="privateGPT", page_icon="💬", layout="wide")
+    st.title("Private GPT: Ask questions to your documents.")
+    # header of the page
+    st.header("Chat with your documents")
+    # add side bar
+    with st.sidebar:
+        st.subheader("Your Documents")
+        files = st.file_uploader('Upload your documents', type=['pdf', 'txt', 'docx', 'doc', 'pptx', 'ppt', 'csv','enex','eml','epub','html','md','odt',], accept_multiple_files=True, key="upload")
+        # convert files form list of UploadedFile to list of Document
+        
+        if st.button("Process Documents"):
+            # add a spiner
+            with st.spinner("Processing your documents..."):
+                # get the text in the documents
+                ingest_main(files)
+    # create text input
+    query = st.text_input("Enter a query: ")
+    if query:
+        # then pass the query to the qa model
         # Get the answer from the chain
         start = time.time()
         res = qa(query)
+        # res = "This is a test"
         answer, docs = res['result'], [] if args.hide_source else res['source_documents']
         end = time.time()
-
-        # Print the result
-        print("\n\n> Question:")
-        print(query)
-        print(f"\n> Answer (took {round(end - start, 2)} s.):")
-        print(answer)
-
+        # write the answer to the screen
+        st.write(answer)
+        # Print the time taken to answer the question
+        st.write(f"\n> Answer (took {round(end - start, 2)} s.):")
         # Print the relevant sources used for the answer
-        for document in docs:
-            print("\n> " + document.metadata["source"] + ":")
-            print(document.page_content)
+        # for document in docs:
+        #     st.write("\n> " + document.metadata["source"] + ":")
+        #     st.write(document.page_content)
+        #     st.write("\n")
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='privateGPT: Ask questions to your documents without an internet connection, '

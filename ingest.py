@@ -110,16 +110,16 @@ def load_documents(source_dir: str, ignored_files: List[str] = []) -> List[Docum
 
     return results
 
-def process_documents(ignored_files: List[str] = []) -> List[Document]:
+def process_documents(documents,ignored_files: List[str] = []) -> List[Document]:
     """
     Load documents and split in chunks
     """
-    print(f"Loading documents from {source_directory}")
-    documents = load_documents(source_directory, ignored_files)
+    # print(f"Loading documents from {source_directory}")
+    # documents = load_documents(source_directory, ignored_files)
     if not documents:
         print("No new documents to load")
         exit(0)
-    print(f"Loaded {len(documents)} new documents from {source_directory}")
+    # print(f"Loaded {len(documents)} new documents from {source_directory}")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     texts = text_splitter.split_documents(documents)
     print(f"Split into {len(texts)} chunks of text (max. {chunk_size} tokens each)")
@@ -138,7 +138,7 @@ def does_vectorstore_exist(persist_directory: str) -> bool:
                 return True
     return False
 
-def main():
+def main(docs: List[Document] = None):
     # Create embeddings
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
 
@@ -147,13 +147,13 @@ def main():
         print(f"Appending to existing vectorstore at {persist_directory}")
         db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
         collection = db.get()
-        texts = process_documents([metadata['source'] for metadata in collection['metadatas']])
+        texts = process_documents(docs,[metadata['source'] for metadata in collection['metadatas']])
         print(f"Creating embeddings. May take some minutes...")
         db.add_documents(texts)
     else:
         # Create and store locally vectorstore
         print("Creating new vectorstore")
-        texts = process_documents()
+        texts = process_documents(docs)
         print(f"Creating embeddings. May take some minutes...")
         db = Chroma.from_documents(texts, embeddings, persist_directory=persist_directory, client_settings=CHROMA_SETTINGS)
     db.persist()
@@ -162,5 +162,5 @@ def main():
     print(f"Ingestion complete! You can now run privateGPT.py to query your documents")
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
