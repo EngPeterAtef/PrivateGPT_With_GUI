@@ -9,7 +9,6 @@ import os
 import argparse
 import time
 import streamlit as st
-from langchain.docstore.document import Document
 from ingest import main as ingest_main
 
 load_dotenv()
@@ -55,16 +54,22 @@ def main():
     with st.sidebar:
         st.subheader("Your Documents")
         files = st.file_uploader('Upload your documents', type=['pdf', 'txt', 'docx', 'doc', 'pptx', 'ppt', 'csv','enex','eml','epub','html','md','odt',], accept_multiple_files=True, key="upload")
-        # convert files form list of UploadedFile to list of Document
+        # save the uploaded files in source_documents folder
+        if files:
+            for file in files:
+                with open(os.path.join("source_documents", file.name), "wb") as f:
+                    f.write(file.getbuffer())
         
         if st.button("Process Documents"):
             # add a spiner
             with st.spinner("Processing your documents..."):
                 # get the text in the documents
-                ingest_main(files)
+                ingest_main()
     # create text input
     query = st.text_input("Enter a query: ")
     if query:
+        # write the query to the screen
+        st.write(f"\n> Question: {query}")
         # then pass the query to the qa model
         # Get the answer from the chain
         start = time.time()
