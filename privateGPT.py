@@ -30,19 +30,19 @@ def main():
         print("No Model")
         st.session_state.qa = None
     qa = st.session_state.qa
+    args = parse_arguments()
     # configure the streamlit app
     st.set_page_config(page_title="privateGPT", page_icon="💬", layout="wide")
     st.title("Private GPT: Ask questions to your documents.")
     # header of the page
     st.header("Chat with your documents")
     # add side bar
-    there_are_files = False
+
     with st.sidebar:
         st.subheader("Your Documents")
         files = st.file_uploader('Upload your documents', type=['pdf', 'txt', 'docx', 'doc', 'pptx', 'ppt', 'csv','enex','eml','epub','html','md','odt',], accept_multiple_files=True, key="upload")
         # save the uploaded files in source_documents folder
         if files:
-            there_are_files = True
             for file in files:
                 with open(os.path.join("source_documents", file.name), "wb") as f:
                     f.write(file.getbuffer())
@@ -55,7 +55,7 @@ def main():
                 ingest_main()
                 print("after ingesttttttttt")
                 # Parse the command line arguments
-                args = parse_arguments()
+                
                 embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
                 db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
                 retriever = db.as_retriever(search_kwargs={"k": target_source_chunks})
@@ -76,17 +76,22 @@ def main():
                 st.session_state.qa = qa
     print("take input")
     # create text input
-    query = st.text_input("Enter a query: ")
-    if query and there_are_files:
+    query = st.text_input("Enter a query: ",key="query")
+    if query:
+        # empty the text_input after pressing enter
+        # st.session_state.query = ""
         # write the query to the screen
         st.write(f"\n> Question: {query}")
         # then pass the query to the qa model
+        # with st.spinner("Processing your documents..."):
         # Get the answer from the chain
         start = time.time()
         if st.session_state.qa is None:
             st.write("Please upload your documents first.")
             return
+        print("query", query)
         res = qa(query)
+        print("res", res)
         # res = "This is a test"
         answer, docs = res['result'], [] if args.hide_source else res['source_documents']
         end = time.time()
