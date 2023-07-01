@@ -83,27 +83,29 @@ def main():
         # write the query to the screen
         st.write(f"\n> Question: {query}")
         # then pass the query to the qa model
-        # with st.spinner("Processing your documents..."):
+        with st.spinner("Waiting for the response..."):
         # Get the answer from the chain
-        start = time.time()
-        if st.session_state.qa is None:
-            st.write("Please upload your documents first.")
-            return
-        print("query", query)
-        res = qa(query)
-        print("res", res)
-        # res = "This is a test"
-        answer, docs = res['result'], [] if args.hide_source else res['source_documents']
-        end = time.time()
-        # write the answer to the screen
-        st.write(answer)
-        # Print the time taken to answer the question
-        st.write(f"\n> Answer (took {round(end - start, 2)} s.):")
-        # Print the relevant sources used for the answer
-        # for document in docs:
-        #     st.write("\n> " + document.metadata["source"] + ":")
-        #     st.write(document.page_content)
-        #     st.write("\n")
+            start = time.time()
+            if st.session_state.qa is None:
+                st.write("Please upload your documents first.")
+                return
+            print("query", query)
+            res = qa(query)
+            print("res", res)
+            # res = "This is a test"
+            answer, docs = res['result'], [] if args.hide_source else res['source_documents']
+            end = time.time()
+            # split on \n to get the first answer
+            best_ans = answer.split('\n\n')[0]
+            # write the answer to the screen
+            st.write(f"\n>>> Answer: {best_ans}")
+            # Print the time taken to answer the question
+            st.write(f"\n>>> Answer (took {round(end - start, 2)} s.):")
+            # Print the relevant sources used for the answer
+            # for document in docs:
+            #     st.write("\n> " + document.metadata["source"] + ":")
+            #     st.write(document.page_content)
+            #     st.write("\n")
 
 
 def parse_arguments():
