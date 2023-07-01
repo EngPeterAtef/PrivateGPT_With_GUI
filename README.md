@@ -116,3 +116,7 @@ To install a C++ compiler on Windows 10/11, follow these steps:
 4. Run the installer and select the `gcc` component.
 
 ## Demo video
+https://github.com/EngPeterAtef/PrviateGPT_With_GUI/assets/75852529/a701f727-b236-47d3-a770-c78fe9e9bfe3
+
+
+
