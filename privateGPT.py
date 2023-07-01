@@ -24,38 +24,25 @@ target_source_chunks = int(os.environ.get('TARGET_SOURCE_CHUNKS',4))
 
 from constants import CHROMA_SETTINGS
 
-def main():
-    # Parse the command line arguments
-    args = parse_arguments()
-    embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
-    db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
-    retriever = db.as_retriever(search_kwargs={"k": target_source_chunks})
-    # activate/deactivate the streaming StdOut callback for LLMs
-    callbacks = [] if args.mute_stream else [StreamingStdOutCallbackHandler()]
-    # Prepare the LLM
-    match model_type:
-        case "LlamaCpp":
-            llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, n_batch=model_n_batch, callbacks=callbacks, verbose=False)
-        case "GPT4All":
-            llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
-        case _default:
-            # raise exception if model_type is not supported
-            raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
-        
-    qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
-    
 
+def main():
+    if 'qa' not in st.session_state:
+        print("No Model")
+        st.session_state.qa = None
+    qa = st.session_state.qa
     # configure the streamlit app
     st.set_page_config(page_title="privateGPT", page_icon="💬", layout="wide")
     st.title("Private GPT: Ask questions to your documents.")
     # header of the page
     st.header("Chat with your documents")
     # add side bar
+    there_are_files = False
     with st.sidebar:
         st.subheader("Your Documents")
         files = st.file_uploader('Upload your documents', type=['pdf', 'txt', 'docx', 'doc', 'pptx', 'ppt', 'csv','enex','eml','epub','html','md','odt',], accept_multiple_files=True, key="upload")
         # save the uploaded files in source_documents folder
         if files:
+            there_are_files = True
             for file in files:
                 with open(os.path.join("source_documents", file.name), "wb") as f:
                     f.write(file.getbuffer())
@@ -64,15 +51,41 @@ def main():
             # add a spiner
             with st.spinner("Processing your documents..."):
                 # get the text in the documents
+                print("ingesttttttttt")
                 ingest_main()
+                print("after ingesttttttttt")
+                # Parse the command line arguments
+                args = parse_arguments()
+                embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
+                db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
+                retriever = db.as_retriever(search_kwargs={"k": target_source_chunks})
+                # activate/deactivate the streaming StdOut callback for LLMs
+                callbacks = [] if args.mute_stream else [StreamingStdOutCallbackHandler()]
+                # Prepare the LLM
+                match model_type:
+                    case "LlamaCpp":
+                        llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+                    case "GPT4All":
+                        llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+                    case _default:
+                        # raise exception if model_type is not supported
+                        raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
+                    
+                qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
+                # save the state of the qa variable
+                st.session_state.qa = qa
+    print("take input")
     # create text input
     query = st.text_input("Enter a query: ")
-    if query:
+    if query and there_are_files:
         # write the query to the screen
         st.write(f"\n> Question: {query}")
         # then pass the query to the qa model
         # Get the answer from the chain
         start = time.time()
+        if st.session_state.qa is None:
+            st.write("Please upload your documents first.")
+            return
         res = qa(query)
         # res = "This is a test"
         answer, docs = res['result'], [] if args.hide_source else res['source_documents']
