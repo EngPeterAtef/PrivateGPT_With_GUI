@@ -29,6 +29,7 @@ def main():
     if 'qa' not in st.session_state:
         print("No Model")
         st.session_state.qa = None
+
     qa = st.session_state.qa
     args = parse_arguments()
     # configure the streamlit app
@@ -36,8 +37,8 @@ def main():
     st.title("Private GPT: Ask questions to your documents.")
     # header of the page
     st.header("Chat with your documents")
-    # add side bar
 
+    # add side bar
     with st.sidebar:
         st.subheader("Your Documents")
         files = st.file_uploader('Upload your documents', type=['pdf', 'txt', 'docx', 'doc', 'pptx', 'ppt', 'csv','enex','eml','epub','html','md','odt',], accept_multiple_files=True, key="upload")
@@ -55,7 +56,6 @@ def main():
                 ingest_main()
                 print("after ingesttttttttt")
                 # Parse the command line arguments
-                
                 embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
                 db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
                 retriever = db.as_retriever(search_kwargs={"k": target_source_chunks})
@@ -96,16 +96,19 @@ def main():
             answer, docs = res['result'], [] if args.hide_source else res['source_documents']
             end = time.time()
             # split on \n to get the first answer
-            best_ans = answer.split('\n\n')[0]
+            # best_ans = answer.split('\n\n')[0]
             # write the answer to the screen
-            st.write(f"\n>>> Answer: {best_ans}")
+            st.write(f"\n>> Answer: {answer}")
             # Print the time taken to answer the question
-            st.write(f"\n>>> Answer (took {round(end - start, 2)} s.):")
             # Print the relevant sources used for the answer
             # for document in docs:
-            #     st.write("\n> " + document.metadata["source"] + ":")
-            #     st.write(document.page_content)
+            #     st.write("\n>> " + document.metadata["source"] + ":")
+            #     st.write('>>>'+document.page_content)
             #     st.write("\n")
+            st.write("\n>> " + docs[0].metadata["source"] + ":")
+            st.write('>>>'+docs[0].page_content)
+            st.write(f"\n>> Answer (took {round(end - start, 2)} s.):")
+            st.write("\n")
 
 
 def parse_arguments():
