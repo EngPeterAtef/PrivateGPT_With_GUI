@@ -1,5 +1,3 @@
-
-https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/a151c176-5664-45f0-8a55-daeb3a57b0e9
 # privateGPT
 
 Ask questions to your documents without an internet connection, using the power of LLMs. 100% private, no data leaves your execution environment at any point. You can ingest documents and ask questions without an internet connection!
