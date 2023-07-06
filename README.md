@@ -115,8 +115,12 @@ To install a C++ compiler on Windows 10/11, follow these steps:
 3. Download the MinGW installer from the [MinGW website](https://sourceforge.net/projects/mingw/).
 4. Run the installer and select the `gcc` component.
 
-## Demo video
+## Demo video For Small .txt File
 https://github.com/EngPeterAtef/PrviateGPT_With_GUI/assets/75852529/a701f727-b236-47d3-a770-c78fe9e9bfe3
-
-
+## Demo video For Large .txt File
+https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/ecb55179-b313-4778-973d-7dfae4d72cb6
+## Demo video For .csv File
+https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/4f0afb25-6bb9-4a6e-8297-b77eec9b4c10
+## Demo video For .pdf File
+https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/45494422-fab9-4b1a-be4c-84610a43b014
 
