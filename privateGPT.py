@@ -114,7 +114,10 @@ def main():
             for i in range(len(docs)):
                 print(docs[i].metadata)
                 st.write(f"##### Souce no. {i+1} :" + docs[i].metadata["source"] + ":")
-                st.write(f'>>> *Page no. {docs[i].metadata["page"]}* : '+docs[i].page_content)
+                try:
+                    st.write(f'>>> *Page no. {docs[i].metadata["page"]}* : '+docs[i].page_content)
+                except:
+                    st.write(f'>>>'+docs[i].page_content)
 
 
 def parse_arguments():
