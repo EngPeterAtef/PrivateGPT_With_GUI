@@ -10,6 +10,7 @@ import argparse
 import time
 import streamlit as st
 from ingest import main as ingest_main
+from langchain.chat_models import ChatOpenAI
 
 load_dotenv()
 
@@ -23,7 +24,6 @@ model_n_batch = int(os.environ.get('MODEL_N_BATCH',8))
 target_source_chunks = int(os.environ.get('TARGET_SOURCE_CHUNKS',4))
 
 from constants import CHROMA_SETTINGS
-
 
 def main():
     if 'qa' not in st.session_state:
@@ -62,15 +62,22 @@ def main():
                 # activate/deactivate the streaming StdOut callback for LLMs
                 callbacks = [] if args.mute_stream else [StreamingStdOutCallbackHandler()]
                 # Prepare the LLM
-                match model_type:
-                    case "LlamaCpp":
-                        llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, n_batch=model_n_batch, callbacks=callbacks, verbose=False)
-                    case "GPT4All":
-                        llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
-                    case _default:
-                        # raise exception if model_type is not supported
-                        raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
-                    
+                # match model_type:
+                #     case "LlamaCpp":
+                #         llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+                #     case "GPT4All":
+                #         llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+                #     case _default:
+                #         # raise exception if model_type is not supported
+                #         raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
+                
+                llm = ChatOpenAI()
+                # memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
+                # conversation_chain = ConversationalRetrievalChain.from_llm(
+                #     llm=llm,
+                #     retriever=vectorstore.as_retriever(),
+                #     memory=memory
+                # )
                 qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
                 # save the state of the qa variable
                 st.session_state.qa = qa
@@ -91,24 +98,23 @@ def main():
                 return
             print("query", query)
             res = qa(query)
-            print("res", res)
+            # print("res", res)
             # res = "This is a test"
             answer, docs = res['result'], [] if args.hide_source else res['source_documents']
             end = time.time()
             # split on \n to get the first answer
             # best_ans = answer.split('\n\n')[0]
             # write the answer to the screen
-            st.write(f"\n>> Answer: {answer}")
+            st.write(f"## Answer:")
+            st.write(f"> {answer}")
             # Print the time taken to answer the question
             # Print the relevant sources used for the answer
-            # for document in docs:
-            #     st.write("\n>> " + document.metadata["source"] + ":")
-            #     st.write('>>>'+document.page_content)
-            #     st.write("\n")
-            st.write("\n>> " + docs[0].metadata["source"] + ":")
-            st.write('>>>'+docs[0].page_content)
-            st.write(f"\n>> Answer (took {round(end - start, 2)} s.):")
-            st.write("\n")
+            st.write(f"> Answer (took {round(end - start, 2)} s.):")
+            st.write(f"### Relevant sources:")
+            for i in range(len(docs)):
+                print(docs[i].metadata)
+                st.write(f"##### Souce no. {i+1} :" + docs[i].metadata["source"] + ":")
+                st.write(f'>>> *Page no. {docs[i].metadata["page"]}* : '+docs[i].page_content)
 
 
 def parse_arguments():
