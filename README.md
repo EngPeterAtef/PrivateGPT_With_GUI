@@ -116,14 +116,19 @@ To install a C++ compiler on Windows 10/11, follow these steps:
 4. Run the installer and select the `gcc` component.
 
 ## Demo video For Small .txt File
+
 https://github.com/EngPeterAtef/PrviateGPT_With_GUI/assets/75852529/a701f727-b236-47d3-a770-c78fe9e9bfe3
+
 ## Demo video For Large .txt File
+
 https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/ecb55179-b313-4778-973d-7dfae4d72cb6
+
 ## Demo video For .csv File
+
 https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/4f0afb25-6bb9-4a6e-8297-b77eec9b4c10
+
 ## Demo video For .pdf File
 
 https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/d4789cd7-0978-42a7-880e-42d208df2c34
 
-
-
+###### Notion document [Link](https://mmsrashid.notion.site/Data-Science-Technical-Test-PrviateGPT-Clone-7146933e552f41549c819c58a85249d8)
