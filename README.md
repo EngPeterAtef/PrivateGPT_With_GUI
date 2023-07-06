@@ -4,7 +4,9 @@ Ask questions about your documents without an internet connection, using the pow
 
 Built with [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https://github.com/nomic-ai/gpt4all), [LlamaCpp](https://github.com/ggerganov/llama.cpp), [Chroma](https://www.trychroma.com/) and [SentenceTransformers](https://www.sbert.net/).
 
-<img width="902" alt="demo" src="https://user-images.githubusercontent.com/721666/236942256-985801c9-25b9-48ef-80be-3acbb4575164.png">
+![image](https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/dc3df8b1-05dc-4fca-a8a5-66dbf2954229)
+![image](https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/a431e7a0-ba3c-4aee-87fc-67caa3968bac)
+
 
 # Environment Setup
 
