@@ -1,6 +1,6 @@
 # privateGPT
 
-Ask questions to your documents without an internet connection, using the power of LLMs. 100% private, no data leaves your execution environment at any point. You can ingest documents and ask questions without an internet connection!
+Ask questions about your documents without an internet connection, using the power of LLMs. 100% private, no data leaves your execution environment at any point. You can ingest documents and ask questions without an internet connection!
 
 Built with [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https://github.com/nomic-ai/gpt4all), [LlamaCpp](https://github.com/ggerganov/llama.cpp), [Chroma](https://www.trychroma.com/) and [SentenceTransformers](https://www.sbert.net/).
 
@@ -122,5 +122,8 @@ https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/ecb55179-b31
 ## Demo video For .csv File
 https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/4f0afb25-6bb9-4a6e-8297-b77eec9b4c10
 ## Demo video For .pdf File
-https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/45494422-fab9-4b1a-be4c-84610a43b014
+
+https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/d4789cd7-0978-42a7-880e-42d208df2c34
+
+
 
