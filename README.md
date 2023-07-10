@@ -1,5 +1,7 @@
 # privateGPT
 
+### Website Link: [open_link](https://chat-with-documents.streamlit.app/ "go to website")
+
 Ask questions about your documents without an internet connection, using the power of LLMs. 100% private, no data leaves your execution environment at any point. You can ingest documents and ask questions without an internet connection!
 
 Built with [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https://github.com/nomic-ai/gpt4all), [LlamaCpp](https://github.com/ggerganov/llama.cpp), [Chroma](https://www.trychroma.com/) and [SentenceTransformers](https://www.sbert.net/).
@@ -7,7 +9,6 @@ Built with [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https:
 ![image](https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/42b0a34d-bbca-495a-b06c-bfd6f21ec751)
 ![image](https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/dc3df8b1-05dc-4fca-a8a5-66dbf2954229)
 ![image](https://github.com/EngPeterAtef/PrivateGPT_With_GUI/assets/75852529/a431e7a0-ba3c-4aee-87fc-67caa3968bac)
-
 
 # Environment Setup
 
