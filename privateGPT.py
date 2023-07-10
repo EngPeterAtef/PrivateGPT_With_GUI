@@ -11,6 +11,7 @@ import time
 import streamlit as st
 from ingest import main as ingest_main
 from langchain.chat_models import ChatOpenAI
+# from langchain.llms import OpenAI
 
 load_dotenv()
 
@@ -79,13 +80,15 @@ def main():
                     #         # raise exception if model_type is not supported
                     #         raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
                     
-                    llm = ChatOpenAI()
+                    llm = ChatOpenAI(openai_api_key=os.environ.get("OPENAI_API_KEY"))
+                    # llm = OpenAI(model_name='text-ada-001',temperature=0.7,openai_api_key=os.environ.get("OPENAI_API_KEY"))
                     # memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
                     # conversation_chain = ConversationalRetrievalChain.from_llm(
                     #     llm=llm,
-                    #     retriever=vectorstore.as_retriever(),
+                    #     retriever=retriever,
                     #     memory=memory
                     # )
+                    # create the qa model with conversation_chain
                     qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
                     # save the state of the qa variable
                     st.session_state.qa = qa
@@ -114,9 +117,9 @@ def main():
                 st.error("Please process your documents first.",icon="⚠")
                 return
             start = time.time()
-            print("query", query)
+            # print("query", query)
             res = qa(query)
-            # print("res", res)
+            print("res", res)
             # res = "This is a test"
             answer, docs = res['result'], [] if args.hide_source else res['source_documents']
             end = time.time()
@@ -128,7 +131,7 @@ def main():
             st.write(f"> Answer (took {round(end - start, 2)} s.):")
             st.write(f"### Relevant sources:")
             for i in range(len(docs)):
-                print(docs[i].metadata)
+                # print(docs[i].metadata)
                 st.write(f"##### Souce no. {i+1} :" + docs[i].metadata["source"] + ":")
                 try:
                     st.write(f'>>> *Page no. {docs[i].metadata["page"]}* : '+docs[i].page_content)
