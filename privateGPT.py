@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+# from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores import Chroma
 # from langchain.llms import GPT4All, LlamaCpp
 import os
@@ -115,8 +115,6 @@ def main():
             # res = "This is a test"
             answer, docs = res['result'], [] if args.hide_source else res['source_documents']
             end = time.time()
-            # split on \n to get the first answer
-            # best_ans = answer.split('\n\n')[0]
             # write the answer to the screen
             st.write(f"## Answer:")
             st.write(f"> {answer}")
