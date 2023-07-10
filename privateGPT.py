@@ -101,14 +101,19 @@ def main():
         # empty the text_input after pressing enter
         # st.session_state.query = ""
         # write the query to the screen
-        st.write(f"\n> Question: {query}")
+        st.write(f"\n## Question: {query}")
         # then pass the query to the qa model
         with st.spinner("Waiting for the response..."):
         # Get the answer from the chain
-            start = time.time()
-            if st.session_state.qa is None:
-                st.write("Please upload your documents first.")
+            if not givenKey:
+                # error
+                st.error("Please enter your API KEY first.",icon="⚠")
                 return
+            if st.session_state.qa is None:
+                # error msg
+                st.error("Please process your documents first.",icon="⚠")
+                return
+            start = time.time()
             print("query", query)
             res = qa(query)
             # print("res", res)
@@ -128,8 +133,7 @@ def main():
                 try:
                     st.write(f'>>> *Page no. {docs[i].metadata["page"]}* : '+docs[i].page_content)
                 except:
-                    st.write(f'>>>'+docs[i].page_content)
-
+                    st.write(f'>>>'+docs[i].page_content)     
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='privateGPT: Ask questions to your documents without an internet connection, '
