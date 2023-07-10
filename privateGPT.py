@@ -4,7 +4,7 @@ from langchain.chains import RetrievalQA
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores import Chroma
-from langchain.llms import GPT4All, LlamaCpp
+# from langchain.llms import GPT4All, LlamaCpp
 import os
 import argparse
 import time
@@ -37,50 +37,63 @@ def main():
     st.title("Private GPT: Ask questions to your documents.")
     # header of the page
     st.header("Chat with your documents")
-
+    givenKey = False
     # add side bar
     with st.sidebar:
-        st.subheader("Your Documents")
-        files = st.file_uploader('Upload your documents', type=['pdf', 'txt', 'docx', 'doc', 'pptx', 'ppt', 'csv','enex','eml','epub','html','md','odt',], accept_multiple_files=True, key="upload")
-        # save the uploaded files in source_documents folder
-        if files:
-            for file in files:
-                with open(os.path.join("source_documents", file.name), "wb") as f:
-                    f.write(file.getbuffer())
+        st.subheader("OPENAI API KEY")
+        st.write("Please enter your OPENAI API KEY")
+        api_key = st.text_input("Enter your API KEY: ",key="api_key")
+        if api_key:
+            os.environ["OPENAI_API_KEY"] = api_key
+            givenKey = True
+
+        if givenKey:
+            st.subheader("Your Documents")
+            files = st.file_uploader('Upload your documents', type=['pdf', 'txt', 'docx', 'doc', 'pptx', 'ppt', 'csv','enex','eml','epub','html','md','odt',], accept_multiple_files=True, key="upload")
+            # save the uploaded files in source_documents folder
+            if files:
+                for file in files:
+                    with open(os.path.join("source_documents", file.name), "wb") as f:
+                        f.write(file.getbuffer())
         
-        if st.button("Process Documents"):
-            # add a spiner
-            with st.spinner("Processing your documents..."):
-                # get the text in the documents
-                print("ingesttttttttt")
-                ingest_main()
-                print("after ingesttttttttt")
-                # Parse the command line arguments
-                embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
-                db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
-                retriever = db.as_retriever(search_kwargs={"k": target_source_chunks})
-                # activate/deactivate the streaming StdOut callback for LLMs
-                callbacks = [] if args.mute_stream else [StreamingStdOutCallbackHandler()]
-                # Prepare the LLM
-                # match model_type:
-                #     case "LlamaCpp":
-                #         llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, n_batch=model_n_batch, callbacks=callbacks, verbose=False)
-                #     case "GPT4All":
-                #         llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
-                #     case _default:
-                #         # raise exception if model_type is not supported
-                #         raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
-                
-                llm = ChatOpenAI()
-                # memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
-                # conversation_chain = ConversationalRetrievalChain.from_llm(
-                #     llm=llm,
-                #     retriever=vectorstore.as_retriever(),
-                #     memory=memory
-                # )
-                qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
-                # save the state of the qa variable
-                st.session_state.qa = qa
+            if st.button("Process Documents") and files:
+                # add a spiner
+                with st.spinner("Processing your documents..."):
+                    # get the text in the documents
+                    print("ingesttttttttt")
+                    ingest_main()
+                    print("after ingesttttttttt")
+                    # Parse the command line arguments
+                    embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
+                    db = Chroma(persist_directory=persist_directory, embedding_function=embeddings, client_settings=CHROMA_SETTINGS)
+                    retriever = db.as_retriever(search_kwargs={"k": target_source_chunks})
+                    # activate/deactivate the streaming StdOut callback for LLMs
+                    # callbacks = [] if args.mute_stream else [StreamingStdOutCallbackHandler()]
+                    # Prepare the LLM
+                    # match model_type:
+                    #     case "LlamaCpp":
+                    #         llm = LlamaCpp(model_path=model_path, n_ctx=model_n_ctx, n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+                    #     case "GPT4All":
+                    #         llm = GPT4All(model=model_path, n_ctx=model_n_ctx, backend='gptj', n_batch=model_n_batch, callbacks=callbacks, verbose=False)
+                    #     case _default:
+                    #         # raise exception if model_type is not supported
+                    #         raise Exception(f"Model type {model_type} is not supported. Please choose one of the following: LlamaCpp, GPT4All")
+                    
+                    llm = ChatOpenAI()
+                    # memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
+                    # conversation_chain = ConversationalRetrievalChain.from_llm(
+                    #     llm=llm,
+                    #     retriever=vectorstore.as_retriever(),
+                    #     memory=memory
+                    # )
+                    qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents= not args.hide_source)
+                    # save the state of the qa variable
+                    st.session_state.qa = qa
+        else:
+            # warning message
+            st.warning("Please enter your API KEY first",icon="⚠")
+            files = None
+        
     print("take input")
     # create text input
     query = st.text_input("Enter a query: ",key="query")
